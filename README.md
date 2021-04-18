@@ -1,4 +1,4 @@
-This is a simple 2D2V electrostatic PIC simulation code runs on single CUDA GPU.
+This is a simple 2D3V electrostatic PIC simulation code runs on single CUDA GPU.
 
 # Installation
 The simulation parameters are written in the code, so no initialization is required,
@@ -38,7 +38,9 @@ saved to current directory.
 
 ## Compiling
 
-Please use `nvcc` to compile and add following flags: `-lnetcdf -lcufft -lcublas -lcurand -arch sm_XX`. Where `sm_XX` means your GPU's compute capability, e.g. `sm_75` for compute capability 7.5.
+Please use `nvcc` to compile and add following flags: `-lnetcdf -lcufft -lcublas -lcurand -arch sm_XX`
+if you want to use NetCDF or just add `-lcufft -lcublas -lcurand -arch sm_XX` if you don't want to use NetCDF.
+Where `sm_XX` means your GPU's compute capability, e.g. `sm_75` for compute capability 7.5.
 
 For example, use `nvcc code.cu -o code -O3 -lnetcdf -lcufft -lcublas -lcurand -arch sm_75` to generate executable `code` on 16XX or 20XX Geforce GPU.
 
@@ -46,5 +48,5 @@ For example, use `nvcc code.cu -o code -O3 -lnetcdf -lcufft -lcublas -lcurand -a
 
 In `SAVE_PATH`, `dataXXXXX.nc` or `dataXXXXX.csv` would be found, with charge density and
 electric field in every grid point been saved. Look for headers for more information.
- In running directory, `energy.dat` would be found,
- with four columns means # of step, total kinetic energy, field energy and total energy.
+In running directory, `energy.dat` would be found,
+with four columns means # of step, total kinetic energy, field energy and total energy.
