@@ -49,4 +49,4 @@ For example, use `nvcc code.cu -o code -O3 -lnetcdf -lcufft -lcublas -lcurand -a
 In `SAVE_PATH`, `dataXXXXX.nc` or `dataXXXXX.csv` would be found, with charge density and
 electric field in every grid point been saved. Look for headers for more information.
 In running directory, `energy.dat` would be found,
-with four columns means # of step, total kinetic energy, field energy and total energy.
+with columns means # of step, kinetic energy for each species, total kinetic energy, field energy and total energy.

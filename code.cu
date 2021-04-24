@@ -456,10 +456,6 @@ int main() {
                 3*sizeof(double), cudaMemcpyHostToDevice);
     }
     flag |= cudaMalloc(&B_dev, 3*sizeof(double));
-    cudaMemcpy(vths_dev, vths,
-            3*N_SPECIES*sizeof(double), cudaMemcpyHostToDevice);
-    cudaMemcpy(vdrs_dev, vdrs,
-            3*N_SPECIES*sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(B_dev, B,
             3*sizeof(double), cudaMemcpyHostToDevice);
 
