@@ -440,15 +440,21 @@ int main() {
     double *pos[N_SPECIES], *vel[N_SPECIES], *den[N_SPECIES];
     double *Ne, *fieldE, *fieldPhi;
 
-    double (*vths_dev)[3], (*vdrs_dev)[3], *B_dev;
+    double *vths_dev[N_SPECIES], *vdrs_dev[N_SPECIES], *B_dev;
 
     double Ek[N_SPECIES], EE, Ek_sum;
 
     int flag = 0;
 
     // Allocate device memory
-    flag |= cudaMalloc(&vths_dev, 3*N_SPECIES*sizeof(double));
-    flag |= cudaMalloc(&vdrs_dev, 3*N_SPECIES*sizeof(double));
+    for (int s = 0; s < N_SPECIES; s++) {
+        flag |= cudaMalloc(vths_dev+s, 3*sizeof(double));
+        flag |= cudaMalloc(vdrs_dev+s, 3*sizeof(double));
+        cudaMemcpy(vths_dev[s], vths[s],
+                3*sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(vdrs_dev[s], vdrs[s],
+                3*sizeof(double), cudaMemcpyHostToDevice);
+    }
     flag |= cudaMalloc(&B_dev, 3*sizeof(double));
     cudaMemcpy(vths_dev, vths,
             3*N_SPECIES*sizeof(double), cudaMemcpyHostToDevice);
@@ -509,16 +515,20 @@ int main() {
 
     start = clock();
     const int nstep = N_STEPS - N_STEPS % N_SAVE;
-    printf("Step \t\t Ek \t\t EE \t\t E\n");
+    printf("Step \t\t");
+    for (int i = 0; i < N_STEPS; i++) {
+        printf("Ek %d\t\t", i);
+    }
+    printf("Ek \t\t EE \t\t E\n");
     for (int step = 0; step <= nstep; step++) {
         
         printf("%d\t\t", step);
         fprintf(output, "%d\t\t", step);
 
         for (int s = 0; s < N_SPECIES; s++) {
-            zero<<<24, 768>>>(den[s], NX*NY);
+            zero<<<24, 1024>>>(den[s], NX*NY);
         }
-        zero<<<24, 768>>>(Ne, NX*NY);
+        zero<<<24, 1024>>>(Ne, NX*NY);
         cudaDeviceSynchronize();
         for (int s = 0; s < N_SPECIES; s++) {
             calNumDensity<<<grd_den, blk_den>>>(pos[s], NPART, den[s], NX, NY);
@@ -559,6 +569,10 @@ int main() {
                 Ne, 1, fieldPhi, 1, &EE);
         EE /= -NPART*2;
 
+        for (int s = 0; s < N_SPECIES; s++) {
+            printf("%e\t", Ek[s]);
+            fprintf(output, "%e\t", Ek[s]);
+        }
         printf("%e\t%e\t%e\n", Ek_sum, EE, Ek_sum+EE);
         fprintf(output, "%e\t%e\t%e\n", Ek_sum, EE, Ek_sum+EE);
 
